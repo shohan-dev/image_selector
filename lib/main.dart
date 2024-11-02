@@ -11,9 +11,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Google Lens Style Crop',
+      title: 'Enhanced Google Lens Crop',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: ImagePickerScreen(),
     );
@@ -30,7 +31,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   ui.Image? _uiImage;
   Rect? _cropRect;
   ui.Image? _croppedImage;
-  double _cornerSize = 20;
+  double _cornerSize = 24;
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -44,7 +45,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
 
       setState(() {
         _cropRect = null;
-        _croppedImage = null; // Reset cropped image when new image is picked
+        _croppedImage = null;
       });
     }
   }
@@ -112,7 +113,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Google Lens Style Crop')),
+      appBar: AppBar(title: Text('Enhanced Google Lens Crop')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -121,13 +122,14 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
               GestureDetector(
                 onTapDown: _initializeCropRect,
                 child: Stack(
+                  alignment: Alignment.center,
                   children: [
                     Image.file(_imageFile!),
                     if (_cropRect != null)
                       Positioned.fill(
                         child: Stack(
                           children: [
-                            Container(color: Colors.black54),
+                            Container(color: Colors.black54.withOpacity(0.3)),
                             Positioned.fromRect(
                               rect: _cropRect!,
                               child: Container(
@@ -142,7 +144,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       border: Border.all(
-                                          color: Colors.white, width: 2),
+                                          color: Colors.blueAccent, width: 2),
                                     ),
                                   ),
                                 ),
@@ -163,18 +165,19 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
                 ),
               )
             else
-              Text('No image selected. Tap to pick one!'),
+              Text('Tap below to pick an image'),
             SizedBox(height: 20),
-            ElevatedButton(
+            ElevatedButton.icon(
               onPressed: _pickImage,
-              child: Text('Pick Image'),
+              icon: Icon(Icons.image),
+              label: Text('Pick Image'),
             ),
             if (_cropRect != null)
-              ElevatedButton(
+              ElevatedButton.icon(
                 onPressed: _cropImage,
-                child: Text('Crop Image'),
+                icon: Icon(Icons.crop),
+                label: Text('Crop Image'),
               ),
-            SizedBox(height: 20),
             if (_croppedImage != null)
               Container(
                 padding: EdgeInsets.all(10),
@@ -185,6 +188,34 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
                 ),
               ),
           ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: () => setState(() {
+                  _cropRect = null;
+                  _croppedImage = null;
+                }),
+                tooltip: 'Reset',
+              ),
+              IconButton(
+                icon: Icon(Icons.image_search),
+                onPressed: _pickImage,
+                tooltip: 'Pick New Image',
+              ),
+              IconButton(
+                icon: Icon(Icons.crop),
+                onPressed: _cropImage,
+                tooltip: 'Crop',
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -200,9 +231,9 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
           width: _cornerSize,
           height: _cornerSize,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.blueAccent,
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.black, width: 1),
+            border: Border.all(color: Colors.white, width: 2),
           ),
         ),
       ),
